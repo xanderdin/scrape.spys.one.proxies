@@ -9,6 +9,5 @@ import scrapy
 
 
 class ProxiesItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
-    pass
+    ip_address = scrapy.Field()
+    port = scrapy.Field()

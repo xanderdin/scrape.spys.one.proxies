@@ -1,5 +1,13 @@
+# -*- coding: utf-8 -*-
+
+#
+# Scrape all proxies from the first page of http://spys.one/proxies/
+#
+
 import scrapy
 import re
+
+from proxies.items import ProxiesItem
 
 
 # Ports for proxies are encoded. Encoding table
@@ -36,8 +44,6 @@ def fill_enctab(arg):
     for v in other_values:
         (a, b) = v[1].split('^')
         enctab[v[0]] = int(a) ^ enctab[b]
-    # for k, v in enctab.items():
-    #     print('%s: %d' % (k, v,))
 
 
 def calc_port(script):
@@ -67,12 +73,11 @@ class ProxiesSpider(scrapy.Spider):
         # 'onmouseover' attribute in common
         rows = response.css('tr[onmouseover]')
         for row in rows:
-            id = row.css('td:nth-child(1) font.spy1::text').extract_first()
-            ip = row.css('td:nth-child(1) font.spy14::text').extract_first()
-            script = row.css('td:nth-child(1) font.spy14 script::text').extract_first()
-            port = calc_port(script)
-            yield {
-                'id': id,
-                'ip_address': ip,
-                'port': port,
-            }
+            item = ProxiesItem()
+            # id = row.css('td:nth-child(1) font.spy1::text').extract_first()
+            item['ip_address'] = row.css(
+                'td:nth-child(1) font.spy14::text').extract_first()
+            script = row.css(
+                'td:nth-child(1) font.spy14 script::text').extract_first()
+            item['port'] = calc_port(script)
+            yield item
